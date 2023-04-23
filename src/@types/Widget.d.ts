@@ -4,6 +4,7 @@ declare global {
     position: number
     label: string
     variant: string
+    color: HexCode
   }
 
   export type DropdownEntryPreset = {

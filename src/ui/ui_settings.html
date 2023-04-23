@@ -1,0 +1,189 @@
+<div id="ui" class="ui">
+
+  <div class="ui-section">Size</div>
+
+  <div class="ui-item-select">
+    <div class="ui-select">
+      <select id="size" name="size" size="1"
+        onchange="sendAction({action: `size`, value: this.value, uuid: undefined})">
+        <option value="small">Small</option>
+        <option value="medium">Medium</option>
+        <option value="large">Large</option>
+        <option value="extraLarge">Extra Large</option>
+        <option value="huge">Huge</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="ui-divider"></div>
+  <div class="ui-section">Options</div>
+
+  <div id="options" class="ui-stack">
+
+  </div>
+
+  <div class="ui-item-action" id="add" onclick="sendAction({ action: `add`, value: undefined, uuid: undefined })">
+    <div class="ui-icon ui-icon-plus"></div>
+    Add option
+  </div>
+
+  <!-- TEMPLATE -->
+
+  <div id="option" style="display: none">
+    <div class="ui-icon ui-icon-draggable"></div>
+    <div class="ui-select ui-select--preview">
+      <div class="ui-select-color"></div>
+      <select class="ui-select-list" name="color" size="1">
+        <option value="green">Green</option>
+        <option value="orange">Orange</option>
+        <option value="red">Red</option>
+        <option value="yellow">Yellow</option>
+        <option value="lightBlue">Light blue</option>
+        <option value="blue">Blue</option>
+        <option value="purple">Purple</option>
+        <option value="black">Black</option>
+        <option value="grey">Grey</option>
+      </select>
+    </div>
+    <input class="ui-input" placeholder="Label" />
+    <button class="ui-button ui-button-remove">
+      <div class="ui-icon ui-icon-minus"></div>
+    </button>
+  </div>
+
+  <!-- TEMPLATE -->
+
+</div>
+
+<script>
+
+  const id = { pluginId: '1155486630045254293' }
+  const url = 'https://www.figma.com'
+  const view = "settings"
+
+  onmessage = (event) => {
+    if (event.data.pluginMessage.data) {
+      document.getElementById('ui').style.display = "flex";
+      document.getElementById('size').value = event.data.pluginMessage.data.size;
+
+      if (event.data.pluginMessage.entries.length >= 9) {
+        document.getElementById("add").style.display = "none"
+      } else {
+        document.getElementById("add").style.display = "flex"
+      }
+
+      event.data.pluginMessage.entries.forEach(entry => {
+        if (document.getElementById(entry.uuid)) {
+
+          const option = document.getElementById(entry.uuid)
+          option.getElementsByClassName("ui-select-color")[0].style.backgroundColor = entry.color
+          option.getElementsByClassName("ui-input")[0].value = entry.label
+          deletionEventHandler(option, event.data.pluginMessage.currentEntry, entry.uuid)
+
+        } else {
+
+          const option = document.getElementById('option').cloneNode(true)
+          option.classList.add('ui-item-draggable')
+          option.setAttribute("id", entry.uuid);
+
+          // Color
+          option.getElementsByClassName("ui-select-color")[0].style.backgroundColor = entry.color
+          option.getElementsByClassName('ui-select-list')[0].value = entry.variant
+          option.getElementsByClassName('ui-select-list')[0].onchange = (e) => sendAction({ action: 'color', value: e.target.value, uuid: entry.uuid })
+
+          // Input
+          option.getElementsByClassName("ui-input")[0].value = entry.label
+          option.getElementsByClassName('ui-input')[0].oninput = (e) => sendAction({ action: 'label', value: e.target.value, uuid: entry.uuid })
+
+          // Delete
+          deletionEventHandler(option, event.data.pluginMessage.currentEntry, entry.uuid)
+
+          option.style.display = "flex"
+          document.getElementById('options').appendChild(option);
+
+        }
+      })
+
+      let items = document.querySelectorAll('.ui-item-draggable')
+
+      items.forEach(item => {
+        item.setAttribute('draggable', true)
+        item.addEventListener('dragstart', dragStart)
+        item.addEventListener('drop', dropped)
+        item.addEventListener('dragenter', cancelDefault)
+        item.addEventListener('dragover', cancelDefault)
+      })
+    }
+  }
+
+  function getIndex(e) {
+    return Array.from(e.parentNode.childNodes).indexOf(e);
+  }
+
+  function dragStart(e) {
+    const index = getIndex(e.target)
+    e.dataTransfer.setData('text/plain', index)
+  }
+
+  function dropped(e) {
+    cancelDefault(e)
+
+    let oldIndex = e.dataTransfer.getData('text/plain')
+    let target = findTarget(e.target)
+
+    if (target) {
+      let newIndex = getIndex(target)
+      let dropped = this.parentNode.childNodes[oldIndex]
+
+      if (newIndex < oldIndex) {
+        target.parentNode.insertBefore(dropped, target)
+        sendAction({ action: 'position', value: newIndex - 1.5, uuid: dropped.id })
+      } else {
+        target.parentNode.insertBefore(dropped, target.nextSibling)
+        sendAction({ action: 'position', value: newIndex - 0.5, uuid: dropped.id })
+      }
+    }
+  }
+
+  function cancelDefault(e) {
+    e.preventDefault()
+    e.stopPropagation()
+    return false
+  }
+
+  function findTarget(e) {
+    if (e.parentNode.classList.contains("ui-item-draggable")) {
+      return e.parentNode
+    } else {
+      if (e.parentNode) {
+        findTarget(e.parentNode)
+      } else {
+        return false
+      }
+    }
+  }
+
+  function deletionEventHandler(option, currentEntry, uuid) {
+    if (currentEntry === uuid) {
+      option.getElementsByClassName("ui-button")[0].classList.add("ui-button--disabled")
+      option.removeEventListener("click", () => { })
+    } else {
+      option.getElementsByClassName("ui-button")[0].addEventListener("click", () => {
+        sendAction({ action: 'delete', value: undefined, uuid: uuid })
+        option.remove()
+      })
+    }
+  }
+
+  function sendAction(action) {
+    parent.postMessage({
+      pluginMessage: {
+        view,
+        action: action.action,
+        value: action.value,
+        uuid: action.uuid
+      }, ...id
+    }, url)
+  }
+
+</script>

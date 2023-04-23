@@ -70,10 +70,10 @@ function Widget() {
               itemType: 'dropdown',
               tooltip: 'Type of new entry',
               propertyName: 'currentEntry',
-              options: entries.keys().map((s) => ({
-                option: s,
-                label: entries.get(s).label
-              })),
+              options: entries
+                .values()
+                .sort((a, b) => a.position - b.position)
+                .map((s) => ({ option: s.uuid, label: s.label })),
               selectedOption: currentEntry
             }
           ] as WidgetPropertyMenuItem[])
@@ -107,8 +107,28 @@ function Widget() {
     })
 
     figma.ui.onmessage = (message) => {
-      if (message.action.indexOf('size') > -1) {
-        setSize(message.action)
+      if (message.action === 'size') {
+        setSize(message.value)
+      }
+
+      if (message.action === 'color') {
+        setColor(message.uuid, message.value)
+      }
+
+      if (message.action === 'delete') {
+        deleteEntry(message.uuid)
+      }
+
+      if (message.action === 'label') {
+        setLabel(message.uuid, message.value)
+      }
+
+      if (message.action === 'position') {
+        setPosition(message.uuid, message.value)
+      }
+
+      if (message.action === 'add') {
+        addEntry()
       }
     }
   })
@@ -116,13 +136,13 @@ function Widget() {
   /* UI */
 
   const updateUI = () => {
-    figma.ui.postMessage({ data })
+    figma.ui.postMessage({ data, entries: entries.values().sort((a, b) => a.position - b.position), currentEntry })
   }
 
   const openUI = (view: string, options: any) => {
     if (view === 'settings') {
       return new Promise((resolve) => {
-        figma.showUI(__uiFiles__.settings, { themeColors: true, title: 'Settings', width: 240, height: 240 })
+        figma.showUI(__uiFiles__.settings, { themeColors: true, title: 'Settings', width: 300, height: 513 })
         setData({ ...data })
         figma.clientStorage.setAsync('isUIopen', true)
       })
@@ -132,8 +152,9 @@ function Widget() {
   /* General */
 
   const setPreset = (index: number) => {
-    EntryPresets[index].entries.forEach((value, i, array) => entries.set(value.uuid, value))
-
+    EntryPresets[index].entries.forEach((value, i, array) =>
+      entries.set(value.uuid, { ...value, color: tokens.status[value.variant].fill })
+    )
     setCurrentEntry(EntryPresets[index].entries[0].uuid)
     setData({
       ...data,
@@ -144,8 +165,59 @@ function Widget() {
   const setSize = (value: string) => {
     setData({
       ...data,
-      size: value.split('_')[1]
+      size: value
     })
+  }
+
+  const setColor = (uuid: string, color: string) => {
+    entries.set(uuid, {
+      ...entries.get(uuid),
+      variant: color,
+      color: tokens.status[color].fill
+    })
+  }
+
+  const deleteEntry = (uuid: string) => {
+    entries.delete(uuid)
+  }
+
+  const addEntry = () => {
+    const id = uuid()
+
+    entries.set(id, {
+      uuid: id,
+      position: entries.values().length,
+      label: 'Option',
+      variant: 'grey',
+      color: tokens.status['grey'].fill
+    })
+  }
+
+  const setLabel = (uuid: string, label: string) => {
+    entries.set(uuid, {
+      ...entries.get(uuid),
+      label
+    })
+  }
+
+  const setPosition = (uuid: string, position: number) => {
+    entries.set(uuid, {
+      ...entries.get(uuid),
+      position: position
+    })
+    sortPositions()
+  }
+
+  const sortPositions = () => {
+    entries
+      .values()
+      .sort((a, b) => a.position - b.position)
+      .forEach((_entry, i) => {
+        entries.set(_entry.uuid, {
+          ..._entry,
+          position: i
+        })
+      })
   }
 
   /* Render */
@@ -155,7 +227,7 @@ function Widget() {
       {data.isDropdown && (
         <Chips
           variant={entries.get(currentEntry).variant}
-          content={entries.get(currentEntry).label}
+          content={entries.get(currentEntry).label.length ? entries.get(currentEntry).label : '...'}
           size={{
             typo: tokens.typo[data.size],
             padding: tokens.layout.chips[data.size]
