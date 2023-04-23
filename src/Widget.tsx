@@ -223,7 +223,14 @@ function Widget() {
   /* Render */
 
   return (
-    <AutoLayout name="Widget" verticalAlignItems="center" direction="vertical" spacing={0} padding={0}>
+    <AutoLayout
+      name="Widget"
+      verticalAlignItems="center"
+      direction="vertical"
+      spacing={0}
+      padding={0}
+      overflow="visible"
+    >
       {data.isDropdown && (
         <Chips
           variant={entries.get(currentEntry).variant}
@@ -246,7 +253,7 @@ function Widget() {
           effect={tokens.shadow.container}
           width={280}
         >
-          <ItemTitle content={'Drowdown presets'} />
+          <ItemTitle content={'Presets'} />
           <AutoLayout
             key="Presets__list"
             name="Presets__list"
