@@ -1,0 +1,25 @@
+{
+    "name": "figwidgets-dropdown",
+    "description": "Figma + FigJam widget development environment",
+    "version": "2.0.0",
+    "scripts": {
+      "build": "node esbuild",
+      "watch": "node esbuild -- --watch"
+    },
+    "author": "alexssh",
+    "license": "MIT",
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/alexssh/figwidgets-dropdown.git"
+    },
+    "homepage": "https://github.com/alexssh/figwidgets-dropdown#readme",
+    "devDependencies": {
+      "@figma/plugin-typings": "*",
+      "@figma/widget-typings": "*",
+      "esbuild": "^0.14.0",
+      "esbuild-copy-static-files": "^0.1.0",
+      "prettier": "^2.4.1",
+      "typescript": "*"
+    }
+  }
+  
