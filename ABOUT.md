@@ -23,9 +23,9 @@ status, dropdown, approved, review, progress, workflow
 
 ## Changelog
 
+- Version 2
+    - manifest.json update
+
 - Version 1
     - Initial release
-
-
-
 
