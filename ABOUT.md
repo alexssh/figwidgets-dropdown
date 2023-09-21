@@ -23,6 +23,9 @@ status, dropdown, approved, review, progress, workflow
 
 ## Changelog
 
+- Version 3
+    - Fix: Dropdown options visibility (Windows)
+
 - Version 2
     - manifest.json update
 

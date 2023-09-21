@@ -235,6 +235,10 @@ body {
   right: 16px;
 }
 
+.ui-item-select option {
+  color: #000000 !important;
+}
+
 /* Item Action */
 
 .ui-item-action {
