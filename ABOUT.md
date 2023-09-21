@@ -23,6 +23,9 @@ status, dropdown, approved, review, progress, workflow
 
 ## Changelog
 
+- Version 4
+    - Minor UX improvements
+
 - Version 3
     - Fix: Dropdown options visibility (Windows)
 
