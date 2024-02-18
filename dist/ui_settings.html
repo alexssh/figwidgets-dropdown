@@ -38,9 +38,9 @@
         <option value="orange">Orange</option>
         <option value="red">Red</option>
         <option value="yellow">Yellow</option>
-        <option value="lightBlue">Light blue</option>
         <option value="blue">Blue</option>
         <option value="purple">Purple</option>
+        <option value="brown">Brown</option>
         <option value="black">Black</option>
         <option value="grey">Grey</option>
       </select>
@@ -60,6 +60,9 @@
   const id = { pluginId: '1155486630045254293' }
   const url = 'https://www.figma.com'
   const view = "settings"
+
+  let draggedElementIndex = undefined
+  let enteredElementIndex = undefined
 
   onmessage = (event) => {
     if (event.data.pluginMessage.data) {
@@ -110,7 +113,8 @@
         item.setAttribute('draggable', true)
         item.addEventListener('dragstart', dragStart)
         item.addEventListener('drop', dropped)
-        item.addEventListener('dragenter', cancelDefault)
+        item.addEventListener('dragenter', dragEnter)
+        item.addEventListener('dragleave', dragLeave)
         item.addEventListener('dragover', cancelDefault)
       })
     }
@@ -123,6 +127,7 @@
   function dragStart(e) {
     const index = getIndex(e.target)
     e.dataTransfer.setData('text/plain', index)
+    draggedElementIndex = index
   }
 
   function dropped(e) {
@@ -130,6 +135,8 @@
 
     let oldIndex = e.dataTransfer.getData('text/plain')
     let target = findTarget(e.target)
+
+    target.classList.remove("ui-item-draggable--target")
 
     if (target) {
       let newIndex = getIndex(target)
@@ -145,6 +152,24 @@
     }
   }
 
+  function dragEnter(e) {
+    let target = findTarget(e.target)
+    target.classList.add("ui-item-draggable--target")
+    enteredElementIndex = getIndex(target)
+    return false
+  }
+
+  function dragLeave(e) {
+    let target = findTarget(e.target)
+    if (enteredElementIndex !== getIndex(target)) {
+      target.classList.remove("ui-item-draggable--target")
+    }
+
+
+    return false
+  }
+
+
   function cancelDefault(e) {
     e.preventDefault()
     e.stopPropagation()
@@ -152,13 +177,17 @@
   }
 
   function findTarget(e) {
-    if (e.parentNode.classList.contains("ui-item-draggable")) {
-      return e.parentNode
+    if (e.classList.contains("ui-item-draggable")) {
+      return e
     } else {
-      if (e.parentNode) {
-        findTarget(e.parentNode)
+      if (e.parentNode.classList.contains("ui-item-draggable")) {
+        return e.parentNode
       } else {
-        return false
+        if (e.parentNode) {
+          return findTarget(e.parentNode)
+        } else {
+          return false
+        }
       }
     }
   }
@@ -413,6 +442,10 @@ body {
   gap: 8px;
   padding: 4px 12px;
   align-items: center;
+}
+
+.ui-item-draggable--target {
+  box-shadow: inset 0 2px 0 0 var(--figma-color-border-strong);
 }
 
 /* Item select */

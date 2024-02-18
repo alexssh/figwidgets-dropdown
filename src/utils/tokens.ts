@@ -15,7 +15,7 @@ const COLOR_GREY_900 = '#252525'
 
 const COLOR_GREEN_600 = '#29B95F'
 const COLOR_BLUE_600 = '#277DFF'
-const COLOR_LIGHTBLUE_600 = '#00B6F0'
+const COLOR_BROWN_600 = '#6B3C16'
 const COLOR_PURPLE_600 = '#7522C5'
 const COLOR_YELLOW_600 = '#FAB020'
 const COLOR_ORANGE_600 = '#FF730E'
@@ -84,15 +84,15 @@ const tokens: Tokens = {
     }
   },
   status: {
-    green: { fill: COLOR_GREEN_600, color: COLOR_WHITE },
-    orange: { fill: COLOR_ORANGE_600, color: COLOR_WHITE },
-    red: { fill: COLOR_RED_600, color: COLOR_WHITE },
-    yellow: { fill: COLOR_YELLOW_600, color: COLOR_WHITE },
-    lightBlue: { fill: COLOR_LIGHTBLUE_600, color: COLOR_WHITE },
-    blue: { fill: COLOR_BLUE_600, color: COLOR_WHITE },
-    purple: { fill: COLOR_PURPLE_600, color: COLOR_WHITE },
-    black: { fill: COLOR_BLACK, color: COLOR_WHITE },
-    grey: { fill: COLOR_GREY_400, color: COLOR_WHITE }
+    green: { fill: COLOR_GREEN_600, color: COLOR_WHITE, preview: '🟢' },
+    orange: { fill: COLOR_ORANGE_600, color: COLOR_WHITE, preview: '🟠' },
+    red: { fill: COLOR_RED_600, color: COLOR_WHITE, preview: '🔴' },
+    yellow: { fill: COLOR_YELLOW_600, color: COLOR_WHITE, preview: '🟡' },
+    blue: { fill: COLOR_BLUE_600, color: COLOR_WHITE, preview: '🔵' },
+    purple: { fill: COLOR_PURPLE_600, color: COLOR_WHITE, preview: '🟣' },
+    brown: { fill: COLOR_BROWN_600, color: COLOR_WHITE, preview: '🟤' },
+    black: { fill: COLOR_BLACK, color: COLOR_WHITE, preview: '⚫️' },
+    grey: { fill: COLOR_GREY_400, color: COLOR_WHITE, preview: '⚪️' }
   },
   radius: {
     container: { cornerRadius: 8 },

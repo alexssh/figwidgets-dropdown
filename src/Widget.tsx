@@ -68,12 +68,12 @@ function Widget() {
             },
             {
               itemType: 'dropdown',
-              tooltip: 'Type of new entry',
+              tooltip: 'Select an option',
               propertyName: 'currentEntry',
               options: entries
                 .values()
                 .sort((a, b) => a.position - b.position)
-                .map((s) => ({ option: s.uuid, label: s.label })),
+                .map((s) => ({ option: s.uuid, label: `${tokens.status[s.variant].preview}  ${s.label}` })),
               selectedOption: currentEntry
             }
           ] as WidgetPropertyMenuItem[])
@@ -183,7 +183,6 @@ function Widget() {
 
   const addEntry = () => {
     const id = uuid()
-
     entries.set(id, {
       uuid: id,
       position: entries.values().length,

@@ -15,7 +15,7 @@ declare global {
       [t: string]: TokenShadow
     }
     status: {
-      [t: string]: TokenBackground & TokenTxt
+      [t: string]: TokenBackground & TokenTxt & TokenPreview
     }
     radius: {
       [t: string]: TokenRadius
@@ -29,6 +29,10 @@ declare global {
   }
 
   type TokenSize = number
+
+  type TokenPreview = {
+    preview: string
+  }
 
   type TokenTxt = {
     color: HexCode | RGBA
